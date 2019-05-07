@@ -1,0 +1,38 @@
+float Xor (float a, float b) {
+    return a*(1.0-b)+b*(1.0-a);
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    vec2 uv = (fragCoord-0.5*iResolution.xy)/iResolution.y;
+
+    vec3 col = vec3(0.0);
+
+    float a = 0.8;
+    float s = sin(a);
+    float c = cos(a);
+    
+    uv *= mat2(c, -s, s, c);
+    
+    uv *= 15.0;
+	vec2 gv = fract(uv)-0.5;
+    vec2 id = floor(uv);
+    
+    float m = 0.0;
+    float t = iTime;
+    
+    for (float y = -1.0; y <= 1.0; y++) {
+        for (float x = -1.0; x <= 1.0; x++) {
+			vec2 offs = vec2(x, y);
+
+            float d = length(gv - offs);
+		    float dist = length(id+offs)*0.3;
+            
+            float r = mix(0.3, 1.5, sin(-t+dist)*0.5+0.5);
+            m = Xor(m, smoothstep(r, r * 0.9, d));
+        }
+    }
+    //col.rg = gv;
+    col += m;
+    fragColor = vec4(col,1.0);
+}
